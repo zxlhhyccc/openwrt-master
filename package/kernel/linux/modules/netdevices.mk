@@ -759,6 +759,21 @@ endef
 $(eval $(call KernelPackage,iavf))
 
 
+define KernelPackage/i40evf
+  SUBMENU:=$(NETWORK_DEVICES_MENU)
+  TITLE:=Intel(R) Ethernet Adaptive Virtual Function support
+  DEPENDS:=@!LINUX_5_4 @PCI_SUPPORT +kmod-i40e
+  KCONFIG:=CONFIG_I40EVF
+  FILES:=$(LINUX_DIR)/drivers/net/ethernet/intel/i40evf/i40evf.ko
+  AUTOLOAD:=$(call AutoProbe,i40evf)
+endef
+
+define KernelPackage/i40evf/description
+ Kernel modules for Intel(R) Ethernet Controller XL710 Family Virtual Function Ethernet adapters.
+endef
+
+$(eval $(call KernelPackage,i40evf))
+
 define KernelPackage/b44
   TITLE:=Broadcom 44xx driver
   KCONFIG:=CONFIG_B44
@@ -1149,33 +1164,11 @@ endef
 
 $(eval $(call KernelPackage,be2net))
 
-define KernelPackage/sfc
-  SUBMENU:=$(NETWORK_DEVICES_MENU)
-  TITLE:=Solarflare SFC9000/SFC9100-family 10Gbps NIC support
-  DEPENDS:=@PCI_SUPPORT +kmod-mdio +kmod-i2c-core +kmod-i2c-algo-bit +kmod-hwmon-core +kmod-ptp +kmod-lib-crc32c
-# add PCI_IOV
-  KCONFIG:= \
-    CONFIG_NET_VENDOR_SOLARFLARE=y \
-    CONFIG_SFC=y \
-    CONFIG_MTD=y \
-    CONFIG_MCDI_MON=y \
-    CONFIG_SRIOV=n \
-    CONFIG_MCDI_LOGGING=n \
-  FILES:=$(LINUX_DIR)/drivers/net/ethernet/sfc/sfc.ko
-  AUTOLOAD:=$(call AutoProbe, sfc)
-endef
-
-define KernelPackage/sfc/description
-  Solarflare SFC9000/SFC9100-family 10Gbps NIC support
-endef
-
-$(eval $(call KernelPackage,sfc))
-
 define KernelPackage/mlx4-core
   SUBMENU:=$(NETWORK_DEVICES_MENU)
   TITLE:=Mellanox ConnectX(R) mlx4 core Network Driver
   DEPENDS:=@PCI_SUPPORT +kmod-ptp
-  FILES:= \
+   FILES:= \
 	$(LINUX_DIR)/drivers/net/ethernet/mellanox/mlx4/mlx4_core.ko \
 	$(LINUX_DIR)/drivers/net/ethernet/mellanox/mlx4/mlx4_en.ko
   KCONFIG:= CONFIG_MLX4_EN \
@@ -1241,3 +1234,26 @@ define KernelPackage/sfp/description
 endef
 
 $(eval $(call KernelPackage,sfp))
+
+
+define KernelPackage/sfc
+  SUBMENU:=$(NETWORK_DEVICES_MENU)
+  TITLE:=Solarflare SFC9000/SFC9100-family 10Gbps NIC support
+  DEPENDS:=@PCI_SUPPORT +kmod-mdio +kmod-i2c-core +kmod-i2c-algo-bit +kmod-hwmon-core +kmod-ptp +kmod-lib-crc32c
+# add PCI_IOV
+  KCONFIG:= \
+    CONFIG_NET_VENDOR_SOLARFLARE=y \
+    CONFIG_SFC=y \
+    CONFIG_MTD=y \
+    CONFIG_MCDI_MON=y \
+    CONFIG_SRIOV=n \
+    CONFIG_MCDI_LOGGING=n \
+  FILES:=$(LINUX_DIR)/drivers/net/ethernet/sfc/sfc.ko
+  AUTOLOAD:=$(call AutoProbe, sfc)
+endef
+
+define KernelPackage/sfc/description
+  Solarflare SFC9000/SFC9100-family 10Gbps NIC support
+endef
+
+$(eval $(call KernelPackage,sfc))
