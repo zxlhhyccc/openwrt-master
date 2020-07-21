@@ -13,15 +13,15 @@ PKG_LICENSE:=GPLv3.0+
 
 LUCI_TITLE:=LuCI support for Flow Offload / Shortcut-FE
 LUCI_DEPENDS:=+pdnsd-alt \
-              +PACKAGE_luci-app-turboacc_INCLUDE_shortcut-fe:kmod-fast-classifier \
-              +PACKAGE_luci-app-turboacc_INCLUDE_flow-offload:kmod-ipt-offload \
-              +PACKAGE_luci-app-turboacc_INCLUDE_bbr-cca:kmod-tcp-bbr \
-              +PACKAGE_luci-app-turboacc_INCLUDE_adguardhome:AdGuardHome \
-              +PACKAGE_luci-app-turboacc_INCLUDE_dnsforwarder:dnsforwarder
+              +PACKAGE_$(PKG_NAME)_INCLUDE_shortcut-fe:kmod-fast-classifier \
+              +PACKAGE_$(PKG_NAME)_INCLUDE_flow-offload:kmod-ipt-offload \
+              +PACKAGE_$(PKG_NAME)_INCLUDE_bbr-cca:kmod-tcp-bbr \
+              +PACKAGE_$(PKG_NAME)_INCLUDE_adguardhome:AdGuardHome \
+              +PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder:dnsforwarder
 LUCI_PKGARCH:=all
 
-define Package/luci-app-turboacc/config
-config PACKAGE_luci-app-turboacc_INCLUDE_shortcut-fe
+define Package/$(PKG_NAME)/config
+config PACKAGE_$(PKG_NAME)_INCLUDE_shortcut-fe
 	bool "Include Shortcut-FE"
 	depends on PACKAGE_$(PKG_NAME)_INCLUDE_flow-offload=n
 	default n
