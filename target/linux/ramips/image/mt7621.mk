@@ -232,6 +232,29 @@ define Device/dlink_dir-8xx-a1
 	check-size
 endef
 
+define Device/dlink_dir-xx60-a1
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_SIZE := 4096k
+  IMAGE_SIZE := 40960k
+  UBINIZE_OPTS := -E 5
+  DEVICE_VENDOR := D-Link
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware wpad-basic \
+	kmod-usb3 kmod-usb-ledtrig-usbport
+  KERNEL := $$(KERNEL) | uimage-padhdr 96
+  IMAGES += factory.bin
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  IMAGE/factory.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | \
+	check-size
+endef
+
+define Device/dlink_dir-1960-a1
+  $(Device/dlink_dir-xx60-a1)
+  DEVICE_MODEL := DIR-1960
+  DEVICE_VARIANT := A1
+endef
+TARGET_DEVICES += dlink_dir-1960-a1
+
 define Device/dlink_dir-860l-b1
   $(Device/seama)
   BLOCKSIZE := 64k
@@ -1066,8 +1089,8 @@ define Device/xiaomi_mir3g
   DEVICE_MODEL := Mi Router 3G
   SUPPORTED_DEVICES += R3G
   SUPPORTED_DEVICES += mir3g
-  DEVICE_PACKAGES := kmod-mt7603 kmod-mt76x2 kmod-usb3 \
-	kmod-usb-ledtrig-usbport wpad-basic uboot-envtools
+  DEVICE_PACKAGES := kmod-mt7603e kmod-mt76x2e kmod-usb3 \
+	kmod-usb-ledtrig-usbport luci-app-mtwifi uboot-envtools
 endef
 TARGET_DEVICES += xiaomi_mir3g
 
@@ -1080,7 +1103,7 @@ define Device/xiaomi_mir3g-v2
   DEVICE_ALT0_VENDOR := Xiaomi
   DEVICE_ALT0_MODEL := Mi Router 4A
   DEVICE_ALT0_VARIANT := Gigabit Edition
-  DEVICE_PACKAGES := kmod-mt7603 kmod-mt76x2 wpad-basic
+  DEVICE_PACKAGES := kmod-mt7603e kmod-mt76x2e luci-app-mtwifi
 endef
 TARGET_DEVICES += xiaomi_mir3g-v2
 
