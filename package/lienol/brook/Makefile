@@ -64,6 +64,7 @@ define Build/Configure
 endef
 
 define Build/Compile
+       chmod +x $(PKG_BUILD_DIR)/brook$(PKG_ARCH_BROOK) && upx --lzma $(PKG_BUILD_DIR)/brook$(PKG_ARCH_BROOK)
 endef
 
 define Package/$(PKG_NAME)/install
