@@ -1,7 +1,7 @@
 ![OpenWrt logo](/logo.svg)
 
 # PROJECT OPENWRT
-## The Source Code of OpenWrt-Lean Modified by CTCGFW
+## The Experimental Source Code of OpenWrt-Snapshot Modified by CTCGFW
 ### Welcome to our Telegram Group: [@ctcgfw\_openwrt\_discuss](https://t.me/ctcgfw_openwrt_discuss).
 - - -
 
@@ -17,7 +17,7 @@ Has access to both ChinaNet & Internet
 ```bash
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
-sudo apt-get install -y build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python python3 python-pip python3-pip python-ply python3-ply haveged lrzsz device-tree-compiler scons antlr3 gperf intltool rsync
+sudo apt-get install -y build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python python3 python-pip python3-pip python-ply python3-ply haveged lrzsz device-tree-compiler scons antlr3 gperf intltool mkisofs rsync
 ```
 #### For mainland China & Ubuntu(16.04+) user, you may run the following command to setup quickly:
 ```bash
@@ -26,10 +26,9 @@ sudo bash -c "bash <(curl -s https://build-scripts.project-openwrt.eu.org/init_b
 
 ## Clone the source
 ```bash
-git clone -b openwrt-18.06 --single-branch https://github.com/project-openwrt/openwrt && cd openwrt
+git clone -b master --single-branch https://github.com/project-openwrt/openwrt && cd openwrt
 ./scripts/feeds update -a && ./scripts/feeds install -a
 ```
-#### For developer, you may use `openwrt-18.06-dev` branch instead of `openwrt-18.06`.
 
 ## Configure your firmware
 ```bash
@@ -46,7 +45,7 @@ You'd better not use **root** to make it, or you may be not able to use.<br/>
 Default login address: 192.168.1.1, username is **root** and password is **password**.
 
 # Contributed
-### See [CONTRIBUTED.md](https://github.com/project-openwrt/openwrt/blob/openwrt-18.06/CONTRIBUTED.md).
+### See [CONTRIBUTED.md](https://github.com/project-openwrt/openwrt/blob/master/CONTRIBUTED.md).
 
 # License
-### [GNU General Public License v3.0](https://github.com/project-openwrt/openwrt/blob/openwrt-18.06/LICENSE).
+### [GNU General Public License v3.0](https://github.com/project-openwrt/openwrt/blob/master/LICENSE).
