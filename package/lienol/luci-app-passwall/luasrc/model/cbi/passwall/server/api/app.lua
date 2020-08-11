@@ -81,6 +81,9 @@ local function start()
                 bin = ln_start(_api.get_v2ray_path(), "v2ray", "-config=" .. config_file)
             elseif type == "Trojan" then
                 config = require("luci.model.cbi.passwall.server.api.trojan").gen_config(user)
+                bin = ln_start("/usr/sbin/trojan", "trojan", "-c " .. config_file)
+            elseif type == "Trojan-Plus" then
+                config = require("luci.model.cbi.passwall.server.api.trojan").gen_config(user)
                 bin = ln_start("/usr/sbin/trojan-plus", "trojan-plus", "-c " .. config_file)
             elseif type == "Trojan-Go" then
                 config = require("luci.model.cbi.passwall.server.api.trojan").gen_config(user)
