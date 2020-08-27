@@ -24,7 +24,7 @@ DEFAULT_PACKAGES += partx-utils mkf2fs fdisk e2fsprogs kmod-button-hotplug wpad 
 		    ath10k-firmware-qca988x ath10k-firmware-qca9888 ath10k-firmware-qca9984 brcmfmac-firmware-43602a1-pcie kmod-crypto-misc \
 		    alsa-utils kmod-ac97 kmod-sound-hda-core kmod-sound-hda-codec-realtek kmod-sound-hda-codec-via kmod-sound-via82xx kmod-sound-hda-intel kmod-sound-hda-codec-hdmi kmod-sound-i8x0 kmod-usb-audio \
 		    kmod-usb-net kmod-usb-net-asix kmod-usb-net-asix-ax88179 kmod-usb-net-rtl8150 kmod-usb-net-rtl8152 kmod-r8168 \
-		    htop lm-sensors autocore automount ddns-scripts_aliyun ddns-scripts_dnspod ca-certificates \
+		    htop lm-sensors autocore-x86 automount ddns-scripts_aliyun ddns-scripts_dnspod ca-certificates \
 		    luci-proto-bonding luci-proto-relay luci-app-unblockmusic luci-app-v2ray-server
 
 $(eval $(call BuildTarget))
