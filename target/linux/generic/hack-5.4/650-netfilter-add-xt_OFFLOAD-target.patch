@@ -70,7 +70,7 @@ Signed-off-by: Felix Fietkau <nbd@nbd.name>
  	help
  	  This option adds the flow table core infrastructure.
  
-@@ -1005,6 +1004,15 @@ config NETFILTER_XT_TARGET_NOTRACK
+@@ -1017,6 +1016,15 @@ config NETFILTER_XT_TARGET_NOTRACK
  	depends on NETFILTER_ADVANCED
  	select NETFILTER_XT_TARGET_CT
  
@@ -88,14 +88,14 @@ Signed-off-by: Felix Fietkau <nbd@nbd.name>
  	depends on NETFILTER_ADVANCED
 --- a/net/netfilter/Makefile
 +++ b/net/netfilter/Makefile
-@@ -144,6 +144,7 @@ obj-$(CONFIG_NETFILTER_XT_TARGET_CLASSIF
+@@ -144,6 +144,7 @@ obj-$(CONFIG_NETFILTER_XT_TARGET_CLASSIFY) += xt_CLASSIFY.o
  obj-$(CONFIG_NETFILTER_XT_TARGET_CONNSECMARK) += xt_CONNSECMARK.o
  obj-$(CONFIG_NETFILTER_XT_TARGET_CT) += xt_CT.o
  obj-$(CONFIG_NETFILTER_XT_TARGET_DSCP) += xt_DSCP.o
 +obj-$(CONFIG_NETFILTER_XT_TARGET_FLOWOFFLOAD) += xt_FLOWOFFLOAD.o
  obj-$(CONFIG_NETFILTER_XT_TARGET_HL) += xt_HL.o
  obj-$(CONFIG_NETFILTER_XT_TARGET_HMARK) += xt_HMARK.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_LED) += xt_LED.o
+ obj-$(CONFIG_NETFILTER_XT_TARGET_IMQ) += xt_IMQ.o
 --- /dev/null
 +++ b/net/netfilter/xt_FLOWOFFLOAD.c
 @@ -0,0 +1,427 @@
