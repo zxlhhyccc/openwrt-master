@@ -32,7 +32,6 @@ Index: linux-5.4.63/arch/arm/boot/dts/Makefile
 +	qcom-ipq4018-jalapeno.dtb \
 +	qcom-ipq4018-meshpoint-one.dtb \
 +	qcom-ipq4018-nbg6617.dtb \
-+	qcom-ipq4019-oap100.dtb \
 +	qcom-ipq4018-rt-ac58u.dtb \
 +	qcom-ipq4018-wre6606.dtb \
  	qcom-ipq4019-ap.dk01.1-c1.dtb \
@@ -53,6 +52,7 @@ Index: linux-5.4.63/arch/arm/boot/dts/Makefile
 +	qcom-ipq4019-r619ac.dtb \
 +	qcom-ipq4019-r619ac-128m.dtb \
 +	qcom-ipq4019-habanero-dvk.dtb \
++	qcom-ipq4019-oap100.dtb \
 +	qcom-ipq4019-rtl30vw.dtb \
 +	qcom-ipq4019-u4019-32m.dtb \
 +	qcom-ipq4019-wpj419.dtb \
