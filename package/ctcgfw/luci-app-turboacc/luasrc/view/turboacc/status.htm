@@ -24,10 +24,5 @@
 			adguardhome_state.innerHTML = status.adguardhome_state ? '<em><b><font color=green><%:RUNNING%></font></b></em><input class="cbi-button mar-10" type="button" value="<%:Open Web Interface%>" onclick="openwebui();" />' : '<em><b><font color=red><%:NOT RUNNING%></font></b></em>';
 		}
 	});
-
-	function openwebui() {
-		var url = window.location.host+":3001";
-		window.open('http://'+url,'target','');
-	};
 //]]>
 //]]></script>
