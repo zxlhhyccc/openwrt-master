@@ -108,19 +108,20 @@ void hostapd_ubus_free_iface(struct hostapd_iface *iface)
 		return;
 }
 
-static void hostapd_send_ubus_event(char *bssname, char *event)
+static void hostapd_notify_ubus(struct ubus_object *obj, char *bssname, char *event)
 {
-	char *name;
+	char *event_type;
 
-	if (!ctx)
+	if (!ctx || !obj)
 		return;
 
-	if (asprintf(&name, "hostapd.%s.%s", bssname, event) < 0)
+	if (asprintf(&event_type, "bss.%s", event) < 0)
 		return;
 
 	blob_buf_init(&b, 0);
-	ubus_send_event(ctx, name, b.head);
-	free(name);
+	blobmsg_add_string(&b, "name", bssname);
+	ubus_notify(ctx, obj, event_type, b.head, -1);
+	free(event_type);
 }
 
 static void hostapd_send_procd_event(char *bssname, char *event)
@@ -149,10 +150,10 @@ static void hostapd_send_procd_event(char *bssname, char *event)
 	free(name);
 }
 
-static void hostapd_send_shared_event(char *bssname, char *event)
+static void hostapd_send_shared_event(struct ubus_object *obj, char *bssname, char *event)
 {
 	hostapd_send_procd_event(bssname, event);
-	hostapd_send_ubus_event(bssname, event);
+	hostapd_notify_ubus(obj, bssname, event);
 }
 
 static void
@@ -201,7 +202,7 @@ hostapd_bss_reload(struct ubus_context *ctx, struct ubus_object *obj,
 	struct hostapd_data *hapd = container_of(obj, struct hostapd_data, ubus.obj);
 	int ret = hostapd_reload_config(hapd->iface, 1);
 
-	hostapd_send_shared_event(hapd->conf->iface, "reload");
+	hostapd_send_shared_event(&hapd->iface->interfaces->ubus, hapd->conf->iface, "reload");
 	return ret;
 }
 
@@ -862,25 +863,40 @@ hostapd_rrm_nr_set(struct ubus_context *ctx, struct ubus_object *obj,
 		struct wpa_ssid_value ssid;
 		struct wpabuf *data;
 		u8 bssid[ETH_ALEN];
-		char *s;
+		char *s, *nr_s;
 
 		blobmsg_parse_array(nr_e_policy, ARRAY_SIZE(nr_e_policy), tb, blobmsg_data(cur), blobmsg_data_len(cur));
 		if (!tb[0] || !tb[1] || !tb[2])
 			goto invalid;
 
-		s = blobmsg_get_string(tb[0]);
-		if (hwaddr_aton(s, bssid))
-			goto invalid;
-
-		s = blobmsg_get_string(tb[1]);
-		ssid.ssid_len = strlen(s);
-		if (ssid.ssid_len > sizeof(ssid.ssid))
-			goto invalid;
-
-		memcpy(&ssid, s, ssid.ssid_len);
-		data = wpabuf_parse_bin(blobmsg_get_string(tb[2]));
+		/* Neighbor Report binary */
+		nr_s = blobmsg_get_string(tb[2]);
+		data = wpabuf_parse_bin(nr_s);
 		if (!data)
 			goto invalid;
+
+		/* BSSID */
+		s = blobmsg_get_string(tb[0]);
+		if (strlen(s) == 0) {
+			/* Copy BSSID from neighbor report */
+			if (hwaddr_compact_aton(nr_s, bssid))
+				goto invalid;
+		} else if (hwaddr_aton(s, bssid)) {
+			goto invalid;
+		}
+
+		/* SSID */
+		s = blobmsg_get_string(tb[1]);
+		if (strlen(s) == 0) {
+			/* Copy SSID from hostapd BSS conf */
+			memcpy(&ssid, &hapd->conf->ssid, sizeof(ssid));
+		} else {
+			ssid.ssid_len = strlen(s);
+			if (ssid.ssid_len > sizeof(ssid.ssid))
+				goto invalid;
+
+			memcpy(&ssid, s, ssid.ssid_len);
+		}
 
 		hostapd_neighbor_set(hapd, bssid, &ssid, data, NULL, NULL, 0);
 		wpabuf_free(data);
@@ -1136,7 +1152,7 @@ void hostapd_ubus_add_bss(struct hostapd_data *hapd)
 	ret = ubus_add_object(ctx, obj);
 	hostapd_ubus_ref_inc();
 
-	hostapd_send_shared_event(hapd->conf->iface, "add");
+	hostapd_send_shared_event(&hapd->iface->interfaces->ubus, hapd->conf->iface, "add");
 }
 
 void hostapd_ubus_free_bss(struct hostapd_data *hapd)
@@ -1147,7 +1163,7 @@ void hostapd_ubus_free_bss(struct hostapd_data *hapd)
 	if (!ctx)
 		return;
 
-	hostapd_send_shared_event(hapd->conf->iface, "remove");
+	hostapd_send_shared_event(&hapd->iface->interfaces->ubus, hapd->conf->iface, "remove");
 
 	if (obj->id) {
 		ubus_remove_object(ctx, obj);
