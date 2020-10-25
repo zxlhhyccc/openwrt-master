@@ -15,13 +15,12 @@ DEVICE_TYPE?=router
 # Default packages - the really basic set
 DEFAULT_PACKAGES:=\
 	base-files \
-	busybox \
 	ca-bundle \
 	dropbear \
 	fstools \
 	libc \
 	libgcc \
-	libustream-openssl \
+	libustream-wolfssl \
 	logd \
 	mtd \
 	netifd \
@@ -62,6 +61,13 @@ DEFAULT_PACKAGES:=\
 	ddns-scripts_aliyun \
 	ddns-scripts_dnspod \
 	bind-host
+
+ifneq ($(CONFIG_SELINUX),)
+DEFAULT_PACKAGES+=busybox-selinux procd-selinux
+else
+DEFAULT_PACKAGES+=busybox procd
+endif
+
 # For the basic set
 DEFAULT_PACKAGES.basic:=
 # For nas targets
@@ -78,7 +84,6 @@ DEFAULT_PACKAGES.router:=\
 	firewall \
 	ip6tables \
 	iptables \
-	kmod-ipt-offload \
 	odhcp6c \
 	odhcpd-ipv6only \
 	ppp \
