@@ -13,7 +13,7 @@ function index()
 end
 
 local function fastpath_status()
-	return luci.sys.call("[ x$(cat /sys/module/xt_FLOWOFFLOAD/refcnt 2>/dev/null) != x0 ] || lsmod | grep -q fast_classifier") == 0
+	return luci.sys.call("{ [ -e /sys/module/xt_FLOWOFFLOAD/refcnt ] && [ x$(cat /sys/module/xt_FLOWOFFLOAD/refcnt 2>/dev/null) != x0 ]; } || lsmod | grep -q fast_classifier") == 0
 end
 
 local function bbr_status()
@@ -21,15 +21,11 @@ local function bbr_status()
 end
 
 local function fullconebat_status()
-	return luci.sys.call("[ x$(cat /sys/module/xt_FULLCONENAT/refcnt 2>/dev/null) != x0 ]") == 0
+	return luci.sys.call("[ -e /sys/module/xt_FULLCONENAT/refcnt ] && [ x$(cat /sys/module/xt_FULLCONENAT/refcnt 2>/dev/null) != x0 ]") == 0
 end
 
 local function dnscaching_status()
-	return luci.sys.call("[ x$(uci -q get turboacc.config.dns_caching_mode) != x3 ] && pgrep dnscache >/dev/null || pgrep AdGuardHome >/dev/null") == 0
-end
-
-local function adguardhome_status()
-	return luci.sys.call("pgrep AdGuardHome >/dev/null") == 0
+	return luci.sys.call("pgrep dnscache >/dev/null") == 0
 end
 
 function action_status()
@@ -38,7 +34,6 @@ function action_status()
 		fastpath_state = fastpath_status(),
 		bbr_state = bbr_status(),
 		fullconenat_state = fullconebat_status(),
-		dnscaching_state = dnscaching_status(),
-		adguardhome_state = adguardhome_status()
+		dnscaching_state = dnscaching_status()
 	})
 end

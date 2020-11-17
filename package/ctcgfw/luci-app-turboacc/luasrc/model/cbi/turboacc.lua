@@ -46,14 +46,12 @@ end
 if nixio.fs.access("/lib/modules/" .. kernel_version .. "/tcp_bbr.ko") then
 bbr_cca = s:option(Flag, "bbr_cca", translate("BBR CCA"))
 bbr_cca.default = 0
-bbr_cca.rmempty = false
 bbr_cca.description = translate("Using BBR CCA can improve TCP network performance effectively")
 end 
 
 if nixio.fs.access("/lib/modules/" .. kernel_version .. "/xt_FULLCONENAT.ko") then
 fullcone_nat = s:option(Flag, "fullcone_nat", translate("FullCone NAT"))
 fullcone_nat.default = 0
-fullcone_nat.rmempty = false
 fullcone_nat.description = translate("Using FullCone NAT can improve gaming performance effectively")
 end 
 
@@ -67,13 +65,10 @@ dns_caching.default = 0
 dns_caching.rmempty = false
 dns_caching.description = translate("Enable DNS Caching and anti ISP DNS pollution")
 
-dns_caching_mode = s:option(ListValue, "dns_caching_mode", translate("Resolve Dns Mode"), translate("AdGuardHome login username/password: AdGuardHome/AdGuardHome"))
+dns_caching_mode = s:option(ListValue, "dns_caching_mode", translate("Resolve DNS Mode"), translate("Only PDNSD and DNSForwarder is supported now"))
 dns_caching_mode:value("1", translate("Using PDNSD to query and cache"))
 if nixio.fs.access("/usr/bin/dnsforwarder") then
 dns_caching_mode:value("2", translate("Using DNSForwarder to query and cache"))
-end
-if nixio.fs.access("/usr/bin/AdGuardHome") then
-dns_caching_mode:value("3", translate("Using AdGuardHome to query and cache"))
 end
 dns_caching_mode.default = 1
 dns_caching_mode:depends("dns_caching", 1)
