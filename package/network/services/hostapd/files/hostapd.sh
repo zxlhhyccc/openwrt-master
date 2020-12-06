@@ -98,6 +98,7 @@ hostapd_common_add_device_config() {
 	config_add_int local_pwr_constraint
 	config_add_string require_mode
 	config_add_boolean legacy_rates
+	config_add_int cell_density
 	config_add_boolean vendor_vht
 
 	config_add_string acs_chan_bias
@@ -116,7 +117,7 @@ hostapd_prepare_device_config() {
 	local base_cfg=
 
 	json_get_vars country country_ie beacon_int:100 dtim_period:2 doth require_mode legacy_rates \
-		acs_chan_bias local_pwr_constraint spectrum_mgmt_required airtime_mode vendor_vht
+		acs_chan_bias local_pwr_constraint spectrum_mgmt_required airtime_mode cell_density vendor_vht
 
 	hostapd_set_log_options base_cfg
 
@@ -125,8 +126,7 @@ hostapd_prepare_device_config() {
 	set_default doth 1
 	set_default legacy_rates 1
 	set_default airtime_mode 0
-
-	[ "$hwmode" = "b" ] && legacy_rates=1
+	set_default cell_density 0
 
 	[ -n "$country" ] && {
 		append base_cfg "country_code=$country" "$N"
@@ -147,17 +147,58 @@ hostapd_prepare_device_config() {
 	json_get_values rate_list supported_rates
 
 	[ -n "$hwmode" ] && append base_cfg "hw_mode=$hwmode" "$N"
-	[ "$legacy_rates" -eq 0 ] && set_default require_mode g
-
-	[ "$hwmode" = "g" ] && {
-		[ "$legacy_rates" -eq 0 ] && set_default rate_list "6000 9000 12000 18000 24000 36000 48000 54000"
-		[ -n "$require_mode" ] && set_default basic_rate_list "6000 12000 24000"
-		[ -n "$vendor_vht" ] && append base_cfg "vendor_vht=$vendor_vht" "$N"
-	}
-
-	case "$require_mode" in
-		n) append base_cfg "require_ht=1" "$N";;
-		ac) append base_cfg "require_vht=1" "$N";;
+	if [ "$hwmode" = "g" ] || [ "$hwmode" = "a" ]; then
+		[ -n "$require_mode" ] && legacy_rates=0
+		case "$require_mode" in
+			n) append base_cfg "require_ht=1" "$N";;
+			ac) append base_cfg "require_vht=1" "$N";;
+		esac
+	fi
+	case "$hwmode" in
+		b)
+			if [ "$cell_density" -eq 1 ]; then
+				set_default rate_list "5500 11000"
+				set_default basic_rate_list "5500 11000"
+			elif [ "$cell_density" -ge 2 ]; then
+				set_default rate_list "11000"
+				set_default basic_rate_list "11000"
+			fi
+		;;
+		g)
+			if [ "$cell_density" -eq 0 ] || [ "$cell_density" -eq 1 ]; then
+				if [ "$legacy_rates" -eq 0 ]; then
+					set_default rate_list "6000 9000 12000 18000 24000 36000 48000 54000"
+					set_default basic_rate_list "6000 12000 24000"
+				elif [ "$cell_density" -eq 1 ]; then
+					set_default rate_list "5500 6000 9000 11000 12000 18000 24000 36000 48000 54000"
+					set_default basic_rate_list "5500 11000"
+				fi
+			elif [ "$cell_density" -ge 3 ] && [ "$legacy_rates" -ne 0 ] || [ "$cell_density" -eq 2 ]; then
+				if [ "$legacy_rates" -eq 0 ]; then
+					set_default rate_list "12000 18000 24000 36000 48000 54000"
+					set_default basic_rate_list "12000 24000"
+				else
+					set_default rate_list "11000 12000 18000 24000 36000 48000 54000"
+					set_default basic_rate_list "11000"
+				fi
+			elif [ "$cell_density" -ge 3 ]; then
+				set_default rate_list "24000 36000 48000 54000"
+				set_default basic_rate_list "24000"
+			fi
+			[ -n "$vendor_vht" ] && append base_cfg "vendor_vht=$vendor_vht" "$N"
+		;;
+		a)
+			if [ "$cell_density" -eq 1 ]; then
+				set_default rate_list "6000 9000 12000 18000 24000 36000 48000 54000"
+				set_default basic_rate_list "6000 12000 24000"
+			elif [ "$cell_density" -eq 2 ]; then
+				set_default rate_list "12000 18000 24000 36000 48000 54000"
+				set_default basic_rate_list "12000 24000"
+			elif [ "$cell_density" -ge 3 ]; then
+				set_default rate_list "24000 36000 48000 54000"
+				set_default basic_rate_list "24000"
+			fi
+		;;
 	esac
 
 	for r in $rate_list; do
@@ -659,6 +700,8 @@ hostapd_set_bss_options() {
 	}
 
 	json_get_vars time_advertisement time_zone wnm_sleep_mode bss_transition
+	set_default bss_transition 0
+	set_default wnm_sleep_mode 0
 
 	[ -n "$time_advertisement" ] && append bss_conf "time_advertisement=$time_advertisement" "$N"
 	[ -n "$time_zone" ] && append bss_conf "time_zone=$time_zone" "$N"
@@ -670,13 +713,18 @@ hostapd_set_bss_options() {
 	if [ "$ieee80211k" -eq "1" ]; then
 		set_default rrm_neighbor_report 1
 		set_default rrm_beacon_report 1
+	else
+		set_default rrm_neighbor_report 0
+		set_default rrm_beacon_report 0
 	fi
 
 	[ "$rrm_neighbor_report" -eq "1" ] && append bss_conf "rrm_neighbor_report=1" "$N"
 	[ "$rrm_beacon_report" -eq "1" ] && append bss_conf "rrm_beacon_report=1" "$N"
 
 	json_get_vars ftm_responder stationary_ap lci civic
+	set_default ftm_responder 0
 	if [ "$ftm_responder" -eq "1" ]; then
+		set_default stationary_ap 0
 		iw phy "$phy" info | grep -q "ENABLE_FTM_RESPONDER" && {
 			append bss_conf "ftm_responder=1" "$N"
 			[ "$stationary_ap" -eq "1" ] && append bss_conf "stationary_ap=1" "$N"
