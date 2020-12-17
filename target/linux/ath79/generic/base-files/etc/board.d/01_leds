@@ -150,6 +150,7 @@ telco,t1)
 	ucidef_set_led_netdev "wan" "WAN" "blue:wan" "eth1"
 	;;
 comfast,cf-wr752ac-v1|\
+engenius,eap300-v2|\
 engenius,ecb1750|\
 enterasys,ws-ap3705i)
 	ucidef_set_led_netdev "lan" "LAN" "blue:lan" "eth0"
@@ -392,8 +393,8 @@ wd,mynet-wifi-rangeextender)
 	ucidef_set_led_rssi "rssihigh" "RSSIMAX" "blue:rssi-max" "wlan0" "66" "100"
 	;;
 xwrt,csac)
-	ucidef_set_led_wlan "wlan5g" "WLAN5G" "xwrt:blue:wlan5g" "phy1tpt"
-	ucidef_set_led_wlan "wlan2g" "WLAN2G" "xwrt:blue:wlan2g" "phy0tpt"
+	ucidef_set_led_wlan "wlan5g" "WLAN5G" "blue:wlan5g" "phy1tpt"
+	ucidef_set_led_wlan "wlan2g" "WLAN2G" "blue:wlan2g" "phy0tpt"
 	;;
 yuncore,a770)
 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"

@@ -12,6 +12,9 @@ uci:foreach(
     function(s)
         server_count = server_count + 1
         s['name'] = s['.name']
+        if(s.alias == nil) then
+            s.alias = "未命名节点"
+        end
         table.insert(server_table, s)
     end
 )
@@ -24,7 +27,12 @@ uci:foreach(
         name = s['.name']
     end
 )
-
+function my_sort(a,b)
+    if(a.alias ~= nil and b.alias ~= nil) then
+        return  a.alias < b.alias
+    end
+end
+table.sort(server_table, my_sort)
 m = Map(vssr)
 
 m:section(SimpleSection).template = 'vssr/status_top'
@@ -37,6 +45,7 @@ s.sortable = false
 
 s.des = server_count
 s.current = uci:get('vssr', name, 'global_server')
+s.serverTable = server_table
 s.servers = json.stringify(server_table)
 s.template = 'vssr/tblsection'
 s.extedit = luci.dispatcher.build_url('admin/services/vssr/servers/%s')

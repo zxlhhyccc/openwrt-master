@@ -7,13 +7,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=AdGuardHome
-PKG_VERSION:=0.104.0
+PKG_VERSION:=0.104.3
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_VERSION:=v$(PKG_VERSION)
 PKG_SOURCE_URL:=https://github.com/AdguardTeam/AdGuardHome
-PKG_MIRROR_HASH:=852861f83c3788a3913cb953b2eb0e2a94c27e2e158feae8c7485480c1481257
+PKG_MIRROR_HASH:=ec0d48413778267f4ac81091e58a88e5b5ee2f3c1ab48256ded3438bf171d311
 
 PKG_LICENSE:=GPL-3.0-only
 PKG_LICENSE_FILES:=LICENSE.txt
@@ -68,7 +68,7 @@ define Build/Compile
   npm --prefix client ci ; \
   npm --prefix client run build-prod ; \
   GOOS=$$$$(go env GOOS) GOARCH=$$$$(go env GOARCH) GO111MODULE=off go get -v github.com/gobuffalo/packr/... ; \
-  "$$$$(go env GOPATH)/bin/packr" -v -z -i $(PKG_BUILD_DIR)/home ; \
+  "$$$$(go env GOPATH)/bin/packr" -v -z -i $(PKG_BUILD_DIR)/internal/home ; \
   $(call GoPackage/Build/Compile) ; \
 )
 ifeq ($(CONFIG_ADGUARDHOME_COMPRESS_UPX),y)

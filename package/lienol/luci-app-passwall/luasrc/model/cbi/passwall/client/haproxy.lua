@@ -1,6 +1,5 @@
 local e = require "luci.sys"
 local net = require "luci.model.network".init()
-local uci = require "luci.model.uci".cursor()
 local api = require "luci.model.cbi.passwall.api.api"
 local appname = "passwall"
 
@@ -47,7 +46,10 @@ o:depends("balancing_enable", 1)
 
 -- [[ Balancing Settings ]]--
 s = m:section(TypedSection, "haproxy_config", "",
-              "<font color='red'>" .. translate("Add a node, Export Of Multi WAN Only support Multi Wan. Load specific gravity range 1-256. Multiple primary servers can be load balanced, standby will only be enabled when the primary server is offline! Multiple groups can be set, Haproxy port same one for each group.").."</font>")
+              "<font color='red'>" .. 
+              translate("Add a node, Export Of Multi WAN Only support Multi Wan. Load specific gravity range 1-256. Multiple primary servers can be load balanced, standby will only be enabled when the primary server is offline! Multiple groups can be set, Haproxy port same one for each group.") ..
+              "\n" .. translate("Note that the node configuration parameters for load balancing must be consistent, otherwise problems can arise!") ..
+              "</font>")
 s.template = "cbi/tblsection"
 s.sortable = true
 s.anonymous = true
@@ -80,6 +82,7 @@ o.default = "5"
 o.rmempty = false
 
 ---- Export
+--[[
 o = s:option(ListValue, "export", translate("Export Of Multi WAN"))
 o:value(0, translate("Auto"))
 local ifaces = e.net:devices()
@@ -94,6 +97,7 @@ for _, iface in ipairs(ifaces) do
 end
 o.default = 0
 o.rmempty = false
+]]--
 
 ---- Mode
 o = s:option(ListValue, "backup", translate("Mode"))

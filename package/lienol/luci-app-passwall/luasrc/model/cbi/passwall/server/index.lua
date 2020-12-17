@@ -47,7 +47,7 @@ e = t:option(DummyValue, "type", translate("Type"))
 e.cfgvalue = function(t, n)
     local v = Value.cfgvalue(t, n)
     if v then
-        if v == "V2ray" then
+        if v == "Xray" or v == "V2ray" then
             local protocol = m:get(n, "protocol")
             return v .. " -> " .. protocol
         end
@@ -56,6 +56,10 @@ e.cfgvalue = function(t, n)
 end
 
 e = t:option(DummyValue, "port", translate("Port"))
+
+e = t:option(Flag, "log", translate("Enable") .. translate("Log"))
+e.default = "1"
+e.rmempty = false
 
 m:append(Template("passwall/server/log"))
 

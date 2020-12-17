@@ -34,6 +34,8 @@ luci-app-cupsd source: [F-Light/luci-app-cupsd](https://github.com/F-Light/luci-
 ootoc-OpenWRT source: [ElonH/ootoc-OpenWRT](https://github.com/ElonH/ootoc-OpenWRT).<br/>
 r8168 source: [BROBIRD/openwrt-r8168](https://github.com/BROBIRD/openwrt-r8168).<br/>
 MentoHUST source: [KyleRicardo/MentoHUST-OpenWrt-ipk](https://github.com/KyleRicardo/MentoHUST-OpenWrt-ipk).<br/>
+luci-app-mentohust source: [BoringCat/luci-app-mentohust](https://github.com/BoringCat/luci-app-mentohust).<br/>
+luci-app-minieap source: [BoringCat/luci-app-minieap](https://github.com/BoringCat/luci-app-minieap).<br/>
 scutclient source: [scutclient/scutclient](https://github.com/scutclient/scutclient).<br/>
 luci-app-scutclient source: [scutclient/luci-app-scutclient](https://github.com/scutclient/luci-app-scutclient).<br/>
 MT-Wifi 5.0.4.0: [MeIsReallyBa/mt7615-dbdc-linux5.4](https://github.com/MeIsReallyBa/mt7615-dbdc-linux5.4).<br/>
@@ -41,7 +43,8 @@ node-request source: [jerrykuku/node-request](https://github.com/jerrykuku/node-
 luci-app-jd-dailybonus source: [jerrykuku/luci-app-jd-dailybonus](https://github.com/jerrykuku/luci-app-jd-dailybonus).<br/>
 luci-app-oled source: [NateLol/luci-app-oled](https://github.com/NateLol/luci-app-oled).<br/>
 luci-app-beardropper source: [NateLol/natelol](https://github.com/NateLol/natelol).<br/>
-luci-app-vssr source: [jerrykuku/luci-app-vssr](https://github.com/jerrykuku/luci-app-vssr).
+luci-app-vssr source: [jerrykuku/luci-app-vssr](https://github.com/jerrykuku/luci-app-vssr).<br/>
+luci-theme-edge source: [garypang13/luci-theme-edge](https://github.com/garypang13/luci-theme-edge).
 
 ## License
 ### Depend on their own License.

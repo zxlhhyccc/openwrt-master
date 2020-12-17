@@ -14,7 +14,7 @@ function gen_config(user)
             for i = 1, #user.uuid do
                 clients[i] = {
                     id = user.uuid[i],
-                    flow = (user.xtls and user.xtls == "1") and user.flow or nil,
+                    flow = user.flow or nil,
                     level = tonumber(user.level),
                     alterId = tonumber(user.alter_id)
                 }
@@ -97,7 +97,7 @@ function gen_config(user)
     local config = {
         log = {
             -- error = "/var/etc/passwall_server/log/" .. user[".name"] .. ".log",
-            loglevel = "warning"
+            loglevel = (user.log and user.log == "1") and user.loglevel or "none"
         },
         -- 传入连接
         inbounds = {
@@ -109,16 +109,6 @@ function gen_config(user)
                 streamSettings = {
                     network = user.transport,
                     security = "none",
-                    xtlsSettings = (user.tls and user.tls == "1" and user.xtls and user.xtls == "1") and {
-                        --alpn = {"http/1.1"},
-                        disableSystemRoot = false,
-                        certificates = {
-                            {
-                                certificateFile = user.tls_certificateFile,
-                                keyFile = user.tls_keyFile
-                            }
-                        }
-                    } or nil,
                     tlsSettings = (user.tls and user.tls == "1") and {
                         disableSystemRoot = false,
                         certificates = {
@@ -176,10 +166,6 @@ function gen_config(user)
 
     if user.tls and user.tls == "1" then
         config.inbounds[1].streamSettings.security = "tls"
-        if user.xtls and user.xtls == "1" then
-            config.inbounds[1].streamSettings.security = "xtls"
-            config.inbounds[1].streamSettings.tlsSettings = nil
-        end
     end
 
     if user.transport == "mkcp" or user.transport == "quic" then
