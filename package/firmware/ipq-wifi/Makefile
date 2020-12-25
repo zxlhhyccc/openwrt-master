@@ -38,12 +38,14 @@ ALLWIFIBOARDS:= \
 	engenius_emd1 \
 	engenius_emr3500 \
 	ezviz_cs-w3-wd1200g-eup \
+	glinet_gl-ap1300 \
 	glinet_gl-s1300 \
 	linksys_ea8300 \
 	linksys_mr8300-v0 \
 	luma_wrtq-329acn \
 	mobipromo_cm520-79f \
 	p2w_r619ac \
+	nec_wg2600hp3 \
 	plasmacloud_pa1200 \
 	plasmacloud_pa2200 \
 	qxwlan_e2600ac
@@ -120,12 +122,14 @@ $(eval $(call generate-ipq-wifi-package,engenius_eap2200,EnGenius EAP2200))
 $(eval $(call generate-ipq-wifi-package,engenius_emd1,EnGenius EMD1))
 $(eval $(call generate-ipq-wifi-package,engenius_emr3500,EnGenius EMR3500))
 $(eval $(call generate-ipq-wifi-package,ezviz_cs-w3-wd1200g-eup,EZVIZ CS-W3-WD1200G EUP))
+$(eval $(call generate-ipq-wifi-package,glinet_gl-ap1300,GL.iNet GL-AP1300))
 $(eval $(call generate-ipq-wifi-package,glinet_gl-s1300,GL.iNet GL-S1300))
 $(eval $(call generate-ipq-wifi-package,linksys_ea8300,Linksys EA8300))
 $(eval $(call generate-ipq-wifi-package,linksys_mr8300-v0,Linksys MR8300))
 $(eval $(call generate-ipq-wifi-package,luma_wrtq-329acn,Luma WRTQ-329ACN))
 $(eval $(call generate-ipq-wifi-package,mobipromo_cm520-79f,MobiPromo CM520-79F))
 $(eval $(call generate-ipq-wifi-package,p2w_r619ac,P&W R619AC))
+$(eval $(call generate-ipq-wifi-package,nec_wg2600hp3,NEC Platforms WG2600HP3))
 $(eval $(call generate-ipq-wifi-package,plasmacloud_pa1200,Plasma Cloud PA1200))
 $(eval $(call generate-ipq-wifi-package,plasmacloud_pa2200,Plasma Cloud PA2200))
 $(eval $(call generate-ipq-wifi-package,qxwlan_e2600ac,Qxwlan E2600AC))

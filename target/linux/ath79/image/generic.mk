@@ -992,6 +992,27 @@ define Device/engenius_eap300-v2
 endef
 TARGET_DEVICES += engenius_eap300-v2
 
+define Device/engenius_eap350-v1
+  $(Device/engenius_loader_okli)
+  SOC := ar7242
+  DEVICE_MODEL := EAP350
+  DEVICE_VARIANT := v1
+  IMAGE_SIZE := 4864k
+  LOADER_FLASH_OFFS := 0x1b0000
+  ENGENIUS_IMGNAME := senao-eap350
+endef
+TARGET_DEVICES += engenius_eap350-v1
+
+define Device/engenius_eap600
+  $(Device/engenius_loader_okli)
+  SOC := ar9344
+  DEVICE_MODEL := EAP600
+  IMAGE_SIZE := 12032k
+  LOADER_FLASH_OFFS := 0x230000
+  ENGENIUS_IMGNAME := senao-eap600
+endef
+TARGET_DEVICES += engenius_eap600
+
 define Device/engenius_ecb1200
   SOC := qca9557
   DEVICE_VENDOR := EnGenius
@@ -1028,6 +1049,16 @@ define Device/engenius_ecb350-v1
   ENGENIUS_IMGNAME := senao-ecb350
 endef
 TARGET_DEVICES += engenius_ecb350-v1
+
+define Device/engenius_ecb600
+  $(Device/engenius_loader_okli)
+  SOC := ar9344
+  DEVICE_MODEL := ECB600
+  IMAGE_SIZE := 12032k
+  LOADER_FLASH_OFFS := 0x230000
+  ENGENIUS_IMGNAME := senao-ecb600
+endef
+TARGET_DEVICES += engenius_ecb600
 
 define Device/engenius_enh202-v1
   $(Device/engenius_loader_okli)
@@ -1650,7 +1681,7 @@ define Device/plasmacloud_pa300-common
   IMAGES += factory.bin
   KERNEL := kernel-bin | append-dtb | lzma | uImage lzma | pad-to $$(BLOCKSIZE)
   IMAGE/factory.bin := append-rootfs | pad-rootfs | openmesh-image ce_type=PA300
-  IMAGE/sysupgrade.bin/squashfs := append-rootfs | pad-rootfs | sysupgrade-tar rootfs=$$$$@ | append-metadata
+  IMAGE/sysupgrade.bin := append-rootfs | pad-rootfs | sysupgrade-tar rootfs=$$$$@ | append-metadata
 endef
 
 define Device/plasmacloud_pa300

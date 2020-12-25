@@ -482,6 +482,21 @@ define Device/ezviz_cs-w3-wd1200g-eup
 endef
 TARGET_DEVICES += ezviz_cs-w3-wd1200g-eup
 
+define Device/glinet_gl-ap1300
+	$(call Device/FitImage)
+	$(call Device/UbiFit)
+	DEVICE_VENDOR := GL.iNet
+	DEVICE_MODEL := GL-AP1300
+	SOC := qcom-ipq4018
+	DEVICE_DTS_CONFIG := config@ap.dk01.1-c2
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	IMAGE_SIZE := 131072k
+	KERNEL_INSTALL := 1
+	DEVICE_PACKAGES := ipq-wifi-glinet_gl-ap1300
+endef
+TARGET_DEVICES += glinet_gl-ap1300
+
 define Device/glinet_gl-b1300
 	$(call Device/FitImage)
 	DEVICE_VENDOR := GL.iNet
@@ -695,6 +710,7 @@ define Device/p2w_r619ac-128m
 	DEVICE_PACKAGES := ipq-wifi-p2w_r619ac
 endef
 TARGET_DEVICES += p2w_r619ac-128m
+
 define Device/plasmacloud_pa1200
 	$(call Device/FitImageLzma)
 	DEVICE_VENDOR := Plasma Cloud
