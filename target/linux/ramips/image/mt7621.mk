@@ -989,10 +989,8 @@ define Device/phicomm_k2p
   IMAGE_SIZE := 15744k
   DEVICE_VENDOR := Phicomm
   DEVICE_MODEL := K2P
-  DEVICE_ALT0_VENDOR := Phicomm
-  DEVICE_ALT0_MODEL := KE 2P
   SUPPORTED_DEVICES += k2p
-  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware
+  DEVICE_PACKAGES := kmod-mt7615d luci-app-mtwifi -wpad-basic-wolfssl
 endef
 TARGET_DEVICES += phicomm_k2p
 
@@ -1129,6 +1127,16 @@ define Device/ubnt_edgerouter-x-sfp
   SUPPORTED_DEVICES += ubnt-erx-sfp ubiquiti,edgerouterx-sfp
 endef
 TARGET_DEVICES += ubnt_edgerouter-x-sfp
+
+define Device/ubnt_unifi-6-lite
+  $(Device/dsa-migration)
+  DEVICE_VENDOR := Ubiquiti
+  DEVICE_MODEL := UniFi 6 Lite
+  DEVICE_PACKAGES += kmod-mt7603 kmod-mt7915e
+  KERNEL := kernel-bin | lzma | fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  IMAGE_SIZE := 15424k
+endef
+TARGET_DEVICES += ubnt_unifi-6-lite
 
 define Device/ubnt_unifi-nanohd
   $(Device/dsa-migration)

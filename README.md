@@ -1,7 +1,7 @@
 ![OpenWrt logo](/logo.svg)
 
 # PROJECT OPENWRT
-## The Experimental Source Code of OpenWrt-Snapshot Modified by CTCGFW
+## The Source Code of OpenWrt-Snapshot Modified by CTCGFW
 ### Welcome to our Telegram Group: [@ctcgfw\_openwrt\_discuss](https://t.me/ctcgfw_openwrt_discuss).
 - - -
 

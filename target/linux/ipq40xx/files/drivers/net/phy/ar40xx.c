@@ -82,6 +82,8 @@ static const struct ar40xx_mib_desc ar40xx_mibs[] = {
 	MIB_DESC(1, AR40XX_STATS_TXLATECOL, "TxLateCol"),
 };
 
+static const int ar40xx_mibs_rx_tx[] = { 15, 31 };
+
 static u32
 ar40xx_read(struct ar40xx_priv *priv, int reg)
 {
@@ -425,6 +427,36 @@ ar40xx_mib_fetch_port_stat(struct ar40xx_priv *priv, int port, bool flush)
 			hi = ar40xx_read(priv, base + mib->offset + 4);
 			t |= hi << 32;
 		}
+
+		mib_stats[i] += t;
+	}
+}
+
+/* similar to ar40xx_mib_fetch_port_stat, but only fetch RXGOODBYTE and TXBYTE */
+static void
+ar40xx_mib_fetch_port_stat_rx_tx(struct ar40xx_priv *priv, int port)
+{
+	unsigned int base;
+	u64 *mib_stats;
+	int j;
+	u32 num_mibs = ARRAY_SIZE(ar40xx_mibs);
+
+	WARN_ON(port >= priv->dev.ports);
+
+	lockdep_assert_held(&priv->mib_lock);
+
+	base = AR40XX_REG_PORT_STATS_START +
+	       AR40XX_REG_PORT_STATS_LEN * port;
+
+	mib_stats = &priv->mib_stats[port * num_mibs];
+	for (j = 0; j < ARRAY_SIZE(ar40xx_mibs_rx_tx); j++) {
+		const int i = ar40xx_mibs_rx_tx[j];
+		const struct ar40xx_mib_desc *mib;
+		u64 t;
+
+		mib = &ar40xx_mibs[i];
+		t = ar40xx_read(priv, base + mib->offset);
+		t |= ar40xx_read(priv, base + mib->offset + 4) << 32;
 
 		mib_stats[i] += t;
 	}
@@ -791,12 +823,11 @@ ar40xx_sw_get_port_stats(struct switch_dev *dev, int port,
 	}
 	last_port = port;
 
-	ar40xx_mib_fetch_port_stat(priv, port, false);
+	ar40xx_mib_fetch_port_stat_rx_tx(priv, port);
 
 	mib_stats = &priv->mib_stats[port * num_mibs];
-	/* 15: TXBYTE, 31: RXGOODBYTE */
-	stats->tx_bytes = mib_stats[15];
-	stats->rx_bytes = mib_stats[31];
+	stats->rx_bytes = mib_stats[ar40xx_mibs_rx_tx[0]];
+	stats->tx_bytes = mib_stats[ar40xx_mibs_rx_tx[1]];
 unlock:
 	mutex_unlock(&priv->mib_lock);
 	return ret;
@@ -1180,7 +1211,6 @@ ar40xx_psgmii_self_test_clean(struct ar40xx_priv *priv)
 	/* disable phy internal loopback */
 	mdiobus_write(bus, 0x1f, 0x10, 0x6860);
 	mdiobus_write(bus, 0x1f, 0x0, 0x9040);
-	ar40xx_phy_mmd_write(priv, 0x1f, 7, 0x8076, 0x0670);
 
 	for (phy = 0; phy < AR40XX_NUM_PORTS - 1; phy++) {
 		/* disable mac loop back */

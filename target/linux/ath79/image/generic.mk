@@ -767,7 +767,7 @@ endef
 TARGET_DEVICES += dlink_dap-1365-a1
 
 define Device/dlink_dap-2xxx
-  IMAGES += factory.img sysupgrade.bin
+  IMAGES += factory.img
   IMAGE/factory.img := append-kernel | pad-offset 6144k 160 | \
 	append-rootfs | wrgg-pad-rootfs | mkwrggimg | check-size
   IMAGE/sysupgrade.bin := append-kernel | mkwrggimg | \
@@ -775,6 +775,17 @@ define Device/dlink_dap-2xxx
   KERNEL := kernel-bin | append-dtb | relocate-kernel | lzma
   KERNEL_INITRAMFS := $$(KERNEL) | mkwrggimg
 endef
+
+define Device/dlink_dap-2230-a1
+  $(Device/dlink_dap-2xxx)
+  SOC := qca9533
+  DEVICE_VENDOR := D-Link
+  DEVICE_MODEL := DAP-2230
+  DEVICE_VARIANT := A1
+  IMAGE_SIZE := 15232k
+  DAP_SIGNATURE := wapn31_dkbs_dap2230
+endef
+TARGET_DEVICES += dlink_dap-2230-a1
 
 define Device/dlink_dap-2660-a1
   $(Device/dlink_dap-2xxx)
@@ -787,6 +798,18 @@ define Device/dlink_dap-2660-a1
   DAP_SIGNATURE := wapac09_dkbs_dap2660
 endef
 TARGET_DEVICES += dlink_dap-2660-a1
+
+define Device/dlink_dap-2680-a1
+  $(Device/dlink_dap-2xxx)
+  SOC := qca9558
+  DEVICE_VENDOR := D-Link
+  DEVICE_MODEL := DAP-2680
+  DEVICE_VARIANT := A1
+  DEVICE_PACKAGES := ath10k-firmware-qca99x0-ct kmod-ath10k-ct
+  IMAGE_SIZE := 15232k
+  DAP_SIGNATURE := wapac36_dkbs_dap2680
+endef
+TARGET_DEVICES += dlink_dap-2680-a1
 
 define Device/dlink_dap-2695-a1
   SOC := qca9558
@@ -807,6 +830,17 @@ define Device/dlink_dap-2695-a1
   SUPPORTED_DEVICES += dap-2695-a1
 endef
 TARGET_DEVICES += dlink_dap-2695-a1
+
+define Device/dlink_dap-3320-a1
+  $(Device/dlink_dap-2xxx)
+  SOC := qca9533
+  DEVICE_VENDOR := D-Link
+  DEVICE_MODEL := DAP-3320
+  DEVICE_VARIANT := A1
+  IMAGE_SIZE := 15296k
+  DAP_SIGNATURE := wapn29_dkbs_dap3320
+endef
+TARGET_DEVICES += dlink_dap-3320-a1
 
 define Device/dlink_dch-g020-a1
   SOC := qca9531
@@ -1583,6 +1617,98 @@ define Device/ocedo_ursus
   IMAGE_SIZE := 7424k
 endef
 TARGET_DEVICES += ocedo_ursus
+
+define Device/openmesh_om2p-common
+  DEVICE_VENDOR := OpenMesh
+  DEVICE_PACKAGES := uboot-envtools
+  IMAGE_SIZE := 7168k
+  BLOCKSIZE := 256k
+  KERNEL := kernel-bin | append-dtb | lzma | uImage lzma | \
+	pad-to $$(BLOCKSIZE)
+  IMAGE/sysupgrade.bin := append-rootfs | pad-rootfs | \
+	openmesh-image ce_type=OM2P | append-metadata
+endef
+
+define Device/openmesh_om2p-v2
+  $(Device/openmesh_om2p-common)
+  SOC := ar9330
+  DEVICE_MODEL := OM2P
+  DEVICE_VARIANT := v2
+  SUPPORTED_DEVICES += om2pv2
+endef
+TARGET_DEVICES += openmesh_om2p-v2
+
+define Device/openmesh_om2p-v4
+  $(Device/openmesh_om2p-common)
+  SOC := qca9533
+  DEVICE_MODEL := OM2P
+  DEVICE_VARIANT := v4
+  SUPPORTED_DEVICES += om2pv4
+endef
+TARGET_DEVICES += openmesh_om2p-v4
+
+define Device/openmesh_om2p-hs-v1
+  $(Device/openmesh_om2p-common)
+  SOC := ar9341
+  DEVICE_MODEL := OM2P-HS
+  DEVICE_VARIANT := v1
+  SUPPORTED_DEVICES += om2p-hs
+endef
+TARGET_DEVICES += openmesh_om2p-hs-v1
+
+define Device/openmesh_om2p-hs-v2
+  $(Device/openmesh_om2p-common)
+  SOC := ar9341
+  DEVICE_MODEL := OM2P-HS
+  DEVICE_VARIANT := v2
+  SUPPORTED_DEVICES += om2p-hsv2
+endef
+TARGET_DEVICES += openmesh_om2p-hs-v2
+
+define Device/openmesh_om2p-hs-v3
+  $(Device/openmesh_om2p-common)
+  SOC := ar9341
+  DEVICE_MODEL := OM2P-HS
+  DEVICE_VARIANT := v3
+  SUPPORTED_DEVICES += om2p-hsv3
+endef
+TARGET_DEVICES += openmesh_om2p-hs-v3
+
+define Device/openmesh_om2p-hs-v4
+  $(Device/openmesh_om2p-common)
+  SOC := qca9533
+  DEVICE_MODEL := OM2P-HS
+  DEVICE_VARIANT := v4
+  SUPPORTED_DEVICES += om2p-hsv4
+endef
+TARGET_DEVICES += openmesh_om2p-hs-v4
+
+define Device/openmesh_om2p-lc
+  $(Device/openmesh_om2p-common)
+  SOC := ar9330
+  DEVICE_MODEL := OM2P-LC
+  SUPPORTED_DEVICES += om2p-lc
+endef
+TARGET_DEVICES += openmesh_om2p-lc
+
+define Device/openmesh_om5p-common
+  SOC := ar9344
+  DEVICE_VENDOR := OpenMesh
+  DEVICE_PACKAGES := uboot-envtools
+  IMAGE_SIZE := 7808k
+  BLOCKSIZE := 64k
+  KERNEL := kernel-bin | append-dtb | lzma | uImage lzma | \
+	pad-to $$(BLOCKSIZE)
+  IMAGE/sysupgrade.bin := append-rootfs | pad-rootfs | \
+	openmesh-image ce_type=OM5P | append-metadata
+endef
+
+define Device/openmesh_om5p
+  $(Device/openmesh_om5p-common)
+  DEVICE_MODEL := OM5P
+  SUPPORTED_DEVICES += om5p
+endef
+TARGET_DEVICES += openmesh_om5p
 
 define Device/openmesh_om5p-ac-v2
   SOC := qca9558
