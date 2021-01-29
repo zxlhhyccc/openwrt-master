@@ -35,7 +35,8 @@ dst() {
 }
 
 comment() {
-	echo "-m comment --comment '$1'"
+	local name=$(echo $1 | sed 's/ /_/g')
+	echo "-m comment --comment '$name'"
 }
 
 RULE_LAST_INDEX() {
@@ -222,7 +223,7 @@ load_acl() {
 		[ "$UDP_NO_REDIR_PORTS" != "disable" ] && $ipt_m -A PSW $(comment "默认") -p udp -m multiport --dport $UDP_NO_REDIR_PORTS -j RETURN
 		[ "$UDP_NODE" != "nil" ] && {
 			msg="UDP默认代理：使用UDP节点 [$(get_action_chain_name $UDP_PROXY_MODE)](TPROXY:${UDP_REDIR_PORT})代理"
-			[ "$UDP_NO_REDIR_PORTS" != "disable" ] && msg="${msg}除${TCP_NO_REDIR_PORTS}外的"
+			[ "$UDP_NO_REDIR_PORTS" != "disable" ] && msg="${msg}除${UDP_NO_REDIR_PORTS}外的"
 			msg="${msg}所有端口"
 			$ipt_m -A PSW $(comment "默认") -p udp $(factor $UDP_REDIR_PORTS "-m multiport --dport") $(dst $IPSET_SHUNTLIST) $(REDIRECT $UDP_REDIR_PORT TPROXY)
 			$ipt_m -A PSW $(comment "默认") -p udp $(factor $UDP_REDIR_PORTS "-m multiport --dport") $(dst $IPSET_BLACKLIST) $(REDIRECT $UDP_REDIR_PORT TPROXY)
@@ -233,10 +234,18 @@ load_acl() {
 	$ipt_m -A PSW $(comment "默认") -p udp -j RETURN
 }
 
+filter_haproxy() {
+	uci show $CONFIG | grep "@haproxy_config" | grep "lbss=" | cut -d "'" -f 2 | grep -E "([0-9]{1,3}[\.]){3}[0-9]{1,3}" | awk -F ":" '{print $1}' | sed -e "/^$/d" | sed -e "s/^/add $IPSET_VPSIPLIST &/g" | awk '{print $0} END{print "COMMIT"}' | ipset -! -R
+	for host in $(uci show $CONFIG | grep "@haproxy_config" | grep "lbss=" | cut -d "'" -f 2 | grep -v -E "([0-9]{1,3}[\.]){3}[0-9]{1,3}" | awk -F ":" '{print $1}'); do
+		ipset -q add $IPSET_VPSIPLIST $(get_host_ip ipv4 $host 1)
+	done
+	echolog "加入负载均衡的节点到ipset[$IPSET_VPSIPLIST]直连完成"
+}
+
 filter_vpsip() {
 	uci show $CONFIG | grep ".address=" | cut -d "'" -f 2 | grep -E "([0-9]{1,3}[\.]){3}[0-9]{1,3}" | sed -e "/^$/d" | sed -e "s/^/add $IPSET_VPSIPLIST &/g" | awk '{print $0} END{print "COMMIT"}' | ipset -! -R
 	#uci show $CONFIG | grep ".address=" | cut -d "'" -f 2 | grep -E "([[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){0,7}::[a-f0-9]{0,4}(:[a-f0-9]{1,4}){0,7}])" | sed -e "/^$/d" | sed -e "s/^/add $IPSET_VPSIP6LIST &/g" | awk '{print $0} END{print "COMMIT"}' | ipset -! -R
-	echolog "过滤所有节点直接 IP 地址完成[$?]"
+	echolog "加入所有节点到ipset[$IPSET_VPSIPLIST]直连完成"
 }
 
 filter_node() {
@@ -311,14 +320,21 @@ filter_node() {
 	elif [ "$proxy_protocol" == "_shunt" ]; then
 		#echolog "  - 按请求目的地址分流（${proxy_type}）..."
 		local default_node=$(config_n_get $proxy_node default_node nil)
-		filter_rules $default_node $stream
+		local default_proxy=$(config_n_get $proxy_node default_proxy 0)
+		if [ "$default_proxy" == 1 ]; then
+			local main_node=$(config_n_get $proxy_node main_node nil)
+			filter_rules $main_node $stream
+		else
+			filter_rules $default_node $stream
+		fi
 :<<!
 		local default_node_address=$(get_host_ip ipv4 $(config_n_get $default_node address) 1)
 		local default_node_port=$(config_n_get $default_node port)
 		
 		local shunt_ids=$(uci show $CONFIG | grep "=shunt_rules" | awk -F '.' '{print $2}' | awk -F '=' '{print $1}')
 		for shunt_id in $shunt_ids; do
-			local shunt_proxy=$(config_n_get $proxy_node "${shunt_id}_proxy" 0)
+			#local shunt_proxy=$(config_n_get $proxy_node "${shunt_id}_proxy" 0)
+			local shunt_proxy=0
 			local shunt_node=$(config_n_get $proxy_node "${shunt_id}" nil)
 			[ "$shunt_node" != "nil" ] && {
 				[ "$shunt_proxy" == 1 ] && {
@@ -395,7 +411,8 @@ add_firewall_rule() {
 	}
 	
 	#  过滤所有节点IP
-	filter_vpsip
+	filter_vpsip > /dev/null 2>&1 &
+	filter_haproxy > /dev/null 2>&1 &
 	
 	$ipt_n -N PSW
 	$ipt_n -A PSW $(dst $IPSET_LANIPLIST) -j RETURN
@@ -439,7 +456,7 @@ add_firewall_rule() {
 		fi
 		_proxy_tcp_access() {
 			[ -n "${2}" ] || return 0
-			ipset test $IPSET_LANIPLIST ${2} 2>/dev/null
+			ipset -q test $IPSET_LANIPLIST ${2}
 			[ $? -eq 0 ] && {
 				echolog "  - 上游 DNS 服务器 ${2} 已在直接访问的列表中，不强制向 TCP 代理转发对该服务器 TCP/${3} 端口的访问"
 				return 0
@@ -498,26 +515,28 @@ add_firewall_rule() {
 	fi
 
 	# 过滤Socks节点
-	local ids=$(uci show $CONFIG | grep "=socks" | awk -F '.' '{print $2}' | awk -F '=' '{print $1}')
-	echolog "分析 Socks 服务所使用节点..."
-	local id enabled node port msg num
-	for id in $ids; do
-		enabled=$(config_n_get $id enabled 0)
-		[ "$enabled" == "1" ] || continue
-		node=$(config_n_get $id node nil)
-		port=$(config_n_get $id port 0)
-		msg="Socks 服务 [:${port}]"
-		if [ "$node" == "nil" ] || [ "$port" == "0" ]; then
-			msg="${msg} 未配置完全，略过"
-		elif [ "$(echo $node | grep ^tcp)" ]; then
-			eval "node=\${TCP_NODE}"
-			msg="${msg} 使用与 TCP 代理自动切换${num} 相同的节点，延后处理"
-		else
-			filter_node $node TCP
-			filter_node $node UDP
-		fi
-		echolog "  - ${msg}"
-	done
+	[ "$SOCKS_ENABLED" = "1" ] && {
+		local ids=$(uci show $CONFIG | grep "=socks" | awk -F '.' '{print $2}' | awk -F '=' '{print $1}')
+		echolog "分析 Socks 服务所使用节点..."
+		local id enabled node port msg num
+		for id in $ids; do
+			enabled=$(config_n_get $id enabled 0)
+			[ "$enabled" == "1" ] || continue
+			node=$(config_n_get $id node nil)
+			port=$(config_n_get $id port 0)
+			msg="Socks 服务 [:${port}]"
+			if [ "$node" == "nil" ] || [ "$port" == "0" ]; then
+				msg="${msg} 未配置完全，略过"
+			elif [ "$(echo $node | grep ^tcp)" ]; then
+				eval "node=\${TCP_NODE}"
+				msg="${msg} 使用与 TCP 代理自动切换${num} 相同的节点，延后处理"
+			else
+				filter_node $node TCP > /dev/null 2>&1 &
+				filter_node $node UDP > /dev/null 2>&1 &
+			fi
+			echolog "  - ${msg}"
+		done
+	}
 
 	# 处理轮换节点的分流或套娃
 	local node port stream switch
@@ -531,7 +550,7 @@ add_firewall_rule() {
 			echolog "  - 采用 TCP 代理的配置"
 		}
 		if [ "$node" != "nil" ]; then
-			filter_node $node $stream $port
+			filter_node $node $stream $port > /dev/null 2>&1 &
 		else
 			echolog "  - 忽略无效的 $stream 代理自动切换"
 		fi
@@ -544,7 +563,7 @@ add_firewall_rule() {
 		local ADD_INDEX=$FORCE_INDEX
 		_proxy_udp_access() {
 			[ -n "${2}" ] || return 0
-			ipset test $IPSET_LANIPLIST ${2} 2>/dev/null
+			ipset -q test $IPSET_LANIPLIST ${2}
 			[ $? == 0 ] && {
 				echolog "  - 上游 DNS 服务器 ${2} 已在直接访问的列表中，不强制向 UDP 代理转发对该服务器 UDP/${3} 端口的访问"
 				return 0

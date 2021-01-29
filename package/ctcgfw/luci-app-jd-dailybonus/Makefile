@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Luci for JD dailybonus Script
-LUCI_DEPENDS:=+node +node-request +coreutils +coreutils-nohup +wget
+LUCI_DEPENDS:=+lua +node +node-request +wget-ssl
 LUCI_PKGARCH:=all
 
 PKG_NAME:=luci-app-jd-dailybonus
-PKG_VERSION:=0.8.9
-PKG_RELEASE:=20201230
+PKG_VERSION:=1.0.3
+PKG_RELEASE:=20210125
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
