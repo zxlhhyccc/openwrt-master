@@ -1,8 +1,8 @@
 #
 # Copyright (C) 2020 - ntop.org and contributors
 #
-# Copyright (C) 2021 CTCGFW Project-OpenWrt
-# <https://project-openwrt.eu.org>
+# Copyright (C) 2021 ImmortalWrt
+# <https://immortalwrt.org>
 #
 # This is free software, licensed under the GNU General Public License v3.
 # See /LICENSE for more information.
@@ -15,7 +15,7 @@ PKG_VERSION:=2.8
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/ntop/n2n/tar.gz/$(PKG_VERSION)?
+PKG_SOURCE_URL:=@GHCODELOAD/ntop/n2n/tar.gz/$(PKG_VERSION)?
 PKG_HASH:=ad9ab95a79dcf6b412c36489f50de54bb54417b5cea854eb54722b6cb8f0fd04
 
 PKG_LICENSE:=GPL-3.0

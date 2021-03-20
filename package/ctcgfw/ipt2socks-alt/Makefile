@@ -1,6 +1,6 @@
 #
-# Copyright (C) 2021 CTCGFW Project-OpenWrt
-# <https://project-openwrt.eu.org>
+# Copyright (C) 2021 ImmortalWrt
+# <https://immortalwrt.org>
 #
 # This is free software, licensed under the GNU General Public License v3.
 # See /LICENSE for more information.
@@ -13,7 +13,7 @@ PKG_VERSION:=1.0.2
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/zfl9/ipt2socks/tar.gz/v$(PKG_VERSION)?
+PKG_SOURCE_URL:=@GHCODELOAD/zfl9/ipt2socks/tar.gz/v$(PKG_VERSION)?
 PKG_HASH:=f247d72b61b1f40ce347904c43523bff257fc9f00ff269ecccf06f1d0f4b9d5e
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(firstword $(subst -, ,$(PKG_NAME)))-$(PKG_VERSION)

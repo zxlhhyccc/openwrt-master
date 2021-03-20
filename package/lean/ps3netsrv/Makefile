@@ -1,6 +1,6 @@
 #
-# Copyright (C) 2021 CTCGFW Project-OpenWrt
-# <https://project-openwrt.eu.org>
+# Copyright (C) 2021 ImmortalWrt
+# <https://immortalwrt.org>
 #
 # This is free software, licensed under the GNU General Public License v3.
 # See /LICENSE for more information.
@@ -13,7 +13,7 @@ PKG_VERSION:=20200610
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/jhonathanc/ps3netsrv/tar.gz/$(PKG_VERSION)?
+PKG_SOURCE_URL:=@GHCODELOAD/jhonathanc/ps3netsrv/tar.gz/$(PKG_VERSION)?
 PKG_HASH:=e456a8edbca7cac95b5396cab71c9bba26e5c838fe4751fffe12b483b5bb4030
 
 PKG_LICENSE:=GPLv3

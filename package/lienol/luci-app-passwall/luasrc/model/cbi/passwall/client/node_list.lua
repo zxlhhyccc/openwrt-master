@@ -7,20 +7,15 @@ m = Map(appname)
 s = m:section(TypedSection, "global_other")
 s.anonymous = true
 
-o = s:option(MultiValue, "nodes_ping", "Ping")
+o = s:option(MultiValue, "nodes_ping", " ")
 o:value("auto_ping", translate("Auto Ping"), translate("This will automatically ping the node for latency"))
 o:value("tcping", translate("Tcping"), translate("This will use tcping replace ping detection of node"))
-
-o = s:option(MultiValue, "nodes_display", translate("Operation"))
-o:value("compact_display_nodes", translate("Concise display nodes"))
-o:value("show_add_mode", translate("Show Add Mode"))
-o:value("show_group", translate("Show Group"))
+o:value("info", translate("Show server address and port"), translate("Show server address and port"))
 
 -- [[ Add the node via the link ]]--
 s:append(Template(appname .. "/node_list/link_add_node"))
 
 local nodes_ping = m:get("@global_other[0]", "nodes_ping") or ""
-local nodes_display = m:get("@global_other[0]", "nodes_display") or ""
 
 -- [[ Node List ]]--
 s = m:section(TypedSection, "nodes")
@@ -41,96 +36,60 @@ function s.remove(e, t)
     luci.http.redirect(api.url("node_list"))
 end
 
-if nodes_display:find("show_group") then
-    show_group = s:option(DummyValue, "group", translate("Group"))
-    show_group.cfgvalue = function(t, n)
-        local group = m:get(n, "group") or "无"
-        return group ~= "" and group or "无"
-    end
-end
-
 s.sortable = true
 -- 简洁模式
-if nodes_display:find("compact_display_nodes") then
-    if show_group then show_group.width = "25%" end
-    o = s:option(DummyValue, "remarks", translate("Remarks"))
-    o.rawhtml = true
-    o.cfgvalue = function(t, n)
-        local str = ""
-        local is_sub = m:get(n, "is_sub") or ""
+o = s:option(DummyValue, "add_mode", "")
+o.cfgvalue = function(t, n)
+    local v = Value.cfgvalue(t, n)
+    if v and v ~= '' then
         local group = m:get(n, "group") or ""
-        local remarks = m:get(n, "remarks") or ""
-        local type = m:get(n, "type") or ""
-        str = str .. string.format("<input type='hidden' id='cbid.%s.%s.type' value='%s'/>", appname, n, type)
-        if type == "Xray" then
-            local protocol = m:get(n, "protocol")
-            if protocol == "_balancing" then
-                type = type .. " 负载均衡"
-            elseif protocol == "_shunt" then
-                type = type .. " 分流"
-            end
+        if group ~= "" then
+            v = v .. " " .. group
         end
-        local address = m:get(n, "address") or ""
-        local port = m:get(n, "port") or ""
-        str = str .. translate(type) .. "：" .. remarks
-        if address ~= "" and port ~= "" then
+        return v
+    else
+        return ''
+    end
+end
+o = s:option(DummyValue, "remarks", translate("Remarks"))
+o.rawhtml = true
+o.cfgvalue = function(t, n)
+    local str = ""
+    local is_sub = m:get(n, "is_sub") or ""
+    local group = m:get(n, "group") or ""
+    local remarks = m:get(n, "remarks") or ""
+    local type = m:get(n, "type") or ""
+    str = str .. string.format("<input type='hidden' id='cbid.%s.%s.type' value='%s'/>", appname, n, type)
+    if type == "Xray" then
+        local protocol = m:get(n, "protocol")
+        if protocol == "_balancing" then
+            protocol = "负载均衡"
+        elseif protocol == "_shunt" then
+            protocol = "分流"
+        elseif protocol == "vmess" then
+            protocol = "VMess"
+        elseif protocol == "vless" then
+            protocol = "VLESS"
+        else
+            protocol = protocol:gsub("^%l",string.upper)
+        end
+        type = type .. " " .. protocol
+    end
+    local address = m:get(n, "address") or ""
+    local port = m:get(n, "port") or ""
+    str = str .. translate(type) .. "：" .. remarks
+    if address ~= "" and port ~= "" then
+        if nodes_ping:find("info") then
             if datatypes.ip6addr(address) then
                 str = str .. string.format("（[%s]:%s）", address, port)
             else
                 str = str .. string.format("（%s:%s）", address, port)
             end
-            str = str .. string.format("<input type='hidden' id='cbid.%s.%s.address' value='%s'/>", appname, n, address)
-            str = str .. string.format("<input type='hidden' id='cbid.%s.%s.port' value='%s'/>", appname, n, port)
         end
-        return str
+        str = str .. string.format("<input type='hidden' id='cbid.%s.%s.address' value='%s'/>", appname, n, address)
+        str = str .. string.format("<input type='hidden' id='cbid.%s.%s.port' value='%s'/>", appname, n, port)
     end
-else
-    ---- Add Mode
-    if nodes_display:find("show_add_mode") then
-        o = s:option(DummyValue, "add_mode", translate("Add Mode"))
-        o.cfgvalue = function(t, n)
-            local v = Value.cfgvalue(t, n)
-            if v and v ~= '' then
-                return v
-            else
-                return '手动'
-            end
-        end
-    end
-
-    ---- Type
-    o = s:option(DummyValue, "type", translate("Type"))
-    o.cfgvalue = function(t, n)
-        local result = ""
-        local v = Value.cfgvalue(t, n)
-        if v then
-            result = translate(v)
-            if v == "Xray" then
-                local protocol = m:get(n, "protocol")
-                if protocol == "_balancing" then
-                    result = result .. " 负载均衡"
-                elseif protocol == "_shunt" then
-                    result = result .. " 分流"
-                end
-            end
-        end
-        return result
-    end
-
-    ---- Remarks
-    o = s:option(DummyValue, "remarks", translate("Remarks"))
-
-    ---- Address
-    o = s:option(DummyValue, "address", translate("Address"))
-    o.cfgvalue = function(t, n)
-        return Value.cfgvalue(t, n) or "---"
-    end
-
-    ---- Port
-    o = s:option(DummyValue, "port", translate("Port"))
-    o.cfgvalue = function(t, n)
-        return Value.cfgvalue(t, n) or "---"
-    end
+    return str
 end
 
 ---- Ping

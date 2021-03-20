@@ -2,8 +2,8 @@
 # Copyright (C) 2015 OpenWrt-dist
 # Copyright (C) 2015 Jian Chang <aa65535@live.com>
 #
-# Copyright (C) 2021 CTCGFW Project-OpenWrt
-# <https://project-openwrt.eu.org>
+# Copyright (C) 2021 ImmortalWrt
+# <https://immortalwrt.org>
 #
 # This is free software, licensed under the GNU General Public License v3.
 # See /LICENSE for more information.

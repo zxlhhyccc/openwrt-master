@@ -40,15 +40,12 @@ function trojan_shadowsocks()
 end
 function socks_http()
 	outbound_settings = {
-		--
 		servers = {
 			{
-				--
 				address = server.server,
 				port = tonumber(server.server_port),
 				users = (server.auth_enable == "1") and {
 					{
-						--
 						user = server.username,
 						pass = server.password
 					}
@@ -115,18 +112,19 @@ local Xray = {
 	} or nil,
 	-- 传出连接
 	outbound = {
-		protocol = server.v2ray_protocol or "vmess",
+		protocol = server.v2ray_protocol,
 		settings = outbound_settings,
 		-- 底层传输配置
 		streamSettings = {
 			network = server.transport or "tcp",
 			security = (server.xtls == '1') and "xtls" or (server.tls == '1') and "tls" or nil,
-			tlsSettings = (server.tls == '1' and (server.insecure == "1" or server.tls_host)) and {
+			tlsSettings = (server.tls == '1' and (server.insecure == "1" or server.tls_host or server.fingerprint)) and {
 				-- tls
+				fingerprint = server.fingerprint,
 				allowInsecure = (server.insecure == "1") and true or nil,
 				serverName = server.tls_host
 			} or nil,
-			xtlsSettings = (server.xtls == '1' and (server.insecure == "1" or server.tls_host)) and {
+			xtlsSettings = (server.xtls == '1' and (server.insecure == "1" or server.tls_host or server.fingerprint)) and {
 				-- xtls
 				allowInsecure = (server.insecure == "1") and true or nil,
 				serverName = server.tls_host
@@ -180,8 +178,7 @@ local Xray = {
 		} or nil
 	} or nil
 }
-local cipher =
-				"ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:AES128-SHA:AES256-SHA:DES-CBC3-SHA"
+local cipher = "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:AES128-SHA:AES256-SHA:DES-CBC3-SHA"
 local cipher13 = "TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384"
 local trojan = {
 	log_level = 3,
@@ -197,7 +194,7 @@ local trojan = {
 	ssl = {
 		verify = (server.insecure == "0") and true or false,
 		verify_hostname = (server.tls == "1") and true or false,
-		cert = "",
+		cert = (server.certificate) and server.certpath or nil,
 		cipher = cipher,
 		cipher_tls13 = cipher13,
 		sni = server.tls_host,
@@ -207,12 +204,6 @@ local trojan = {
 		session_ticket = (server.tls_sessionTicket == "1") and true or false
 	},
 	udp_timeout = 60,
-	mux = (server.mux == "1") and {
-		-- mux
-		enabled = true,
-		concurrency = tonumber(server.concurrency),
-		idle_timeout = 60
-	} or nil,
 	tcp = {
 		-- tcp
 		no_delay = true,
@@ -266,37 +257,6 @@ function config:handleIndex(index)
 			print(json.stringify(Xray, 1))
 		end,
 		trojan = function()
-			print(json.stringify(trojan, 1))
-		end,
-		trojan_go = function()
-			trojan.ssl.cipher = server.fingerprint == nil and cipher or (server.fingerprint == "disable" and cipher13 .. ":" .. cipher or "")
-			trojan.ssl.cipher_tls13 = server.fingerprint == nil and cipher13 or nil
-			trojan.ssl.fingerprint = (server.fingerprint ~= nil and server.fingerprint ~= "disable") and server.fingerprint or ""
-			trojan.ssl.alpn = server.trojan_transport == 'ws' and {} or {"h2", "http/1.1"}
-			if server.tls ~= "1" and server.trojan_transport == "original" then
-				--
-				trojan.ssl = nil
-				trojan.transport_plugin = server.trojan_transport == "original" and {
-					enabled = server.plugin_type ~= nil,
-					type = server.plugin_type or "plaintext",
-					command = server.plugin_type ~= "plaintext" and server.plugin_cmd or nil,
-					option = server.plugin_type ~= "plaintext" and server.plugin_option or nil,
-					arg = server.plugin_type ~= "plaintext" and {server.plugin_arg} or nil,
-					env = {}
-				} or nil
-			end
-			trojan.websocket = server.trojan_transport and server.trojan_transport:find('ws') and {
-				--
-				enabled = true,
-				path = server.ws_path or "/",
-				host = server.ws_host or (server.tls_host or server.server)
-			} or nil
-			trojan.shadowsocks = (server.ss_aead == "1") and {
-				--
-				enabled = true,
-				method = server.ss_aead_method or "aead_aes_128_gcm",
-				password = server.ss_aead_pwd or ""
-			} or nil
 			print(json.stringify(trojan, 1))
 		end,
 		naiveproxy = function()

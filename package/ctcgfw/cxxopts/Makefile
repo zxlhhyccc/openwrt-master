@@ -1,6 +1,6 @@
 #
-# Copyright (C) 2021 CTCGFW Project-OpenWrt
-# (https://project-openwrt.eu.org)
+# Copyright (C) 2021 ImmortalWrt
+# (https://immortalwrt.org)
 #
 # This is free software, licensed under the GNU General Public License v3.
 # See /LICENSE for more information.
@@ -12,12 +12,12 @@ PKG_VERSION:=2.2.1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/jarro2783/cxxopts/tar.gz/v$(PKG_VERSION)?
+PKG_SOURCE_URL:=@GHCODELOAD/jarro2783/cxxopts/tar.gz/v$(PKG_VERSION)?
 PKG_HASH:=984aa3c8917d649b14d7f6277104ce38dd142ce378a9198ec926f03302399681
 
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=CN_SZTL <cnsztl@project-openwrt.eu.org>
+PKG_MAINTAINER:=CN_SZTL <cnsztl@immortalwrt.org>
 
 PKG_BUILD_PARALLEL:=1
 CMAKE_INSTALL:=1

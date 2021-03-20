@@ -55,22 +55,42 @@ function get_args(arg, myarg)
 end
 
 function get_valid_nodes()
+    local nodes_ping = uci_get_type("global_other", "nodes_ping") or ""
     local nodes = {}
     uci:foreach(appname, "nodes", function(e)
+        e.id = e[".name"]
         if e.type and e.remarks then
             if e.protocol and (e.protocol == "_balancing" or e.protocol == "_shunt") then
-                e.remarks_name = "%s：[%s] " % {i18n.translatef(e.type .. e.protocol), e.remarks}
-                e.node_type = "special"
+                e["remark"] = "%s：[%s] " % {i18n.translatef(e.type .. e.protocol), e.remarks}
+                e["node_type"] = "special"
                 nodes[#nodes + 1] = e
             end
             if e.port and e.address then
                 local address = e.address
                 if datatypes.ipaddr(address) or datatypes.hostname(address) then
+                    local type2 = e.type
                     local address2 = address
+                    if type2 == "Xray" and e.protocol then
+                        local protocol = e.protocol
+                        if protocol == "vmess" then
+                            protocol = "VMess"
+                        elseif protocol == "vless" then
+                            protocol = "VLESS"
+                        else
+                            protocol = protocol:gsub("^%l",string.upper)
+                        end
+                        type2 = type2 .. " " .. protocol
+                    end
                     if datatypes.ip6addr(address) then address2 = "[" .. address .. "]" end
-                    e.remarks_name = "%s：[%s] %s:%s" % {e.type, e.remarks, address2, e.port}
+                    e["remark"] = "%s：[%s]" % {type2, e.remarks}
+                    if nodes_ping:find("info") then
+                        e["remark"] = "%s：[%s] %s:%s" % {type2, e.remarks, address2, e.port}
+                    end
                     if e.use_kcp and e.use_kcp == "1" then
-                    e.remarks_name = "%s+%s：[%s] %s" % {e.type, "Kcptun", e.remarks, address2}
+                        e["remark"] = "%s+%s：[%s]" % {type2, "Kcptun", e.remarks}
+                        if nodes_ping:find("info") then
+                            e["remark"] = "%s+%s：[%s] %s" % {type2, "Kcptun", e.remarks, address2}
+                        end
                     end
                     e.node_type = "normal"
                     nodes[#nodes + 1] = e
@@ -87,10 +107,22 @@ function get_full_node_remarks(n)
         if n.protocol and (n.protocol == "_balancing" or n.protocol == "_shunt") then
             remarks = "%s：[%s] " % {i18n.translatef(n.type .. n.protocol), n.remarks}
         else
+            local type2 = n.type
+            if n.type == "Xray" and n.protocol then
+                local protocol = n.protocol
+                if protocol == "vmess" then
+                    protocol = "VMess"
+                elseif protocol == "vless" then
+                    protocol = "VLESS"
+                else
+                    protocol = protocol:gsub("^%l",string.upper)
+                end
+                type2 = type2 .. " " .. protocol
+            end
             if n.use_kcp and n.use_kcp == "1" then
-                remarks = "%s+%s：[%s] %s" % {n.type, "Kcptun", n.remarks, n.address}
+                remarks = "%s+%s：[%s] %s" % {type2, "Kcptun", n.remarks, n.address}
             else
-                remarks = "%s：[%s] %s:%s" % {n.type, n.remarks, n.address, n.port}
+                remarks = "%s：[%s] %s:%s" % {type2, n.remarks, n.address, n.port}
             end
         end
     end
@@ -134,7 +166,25 @@ function get_customed_path(e)
 end
 
 function is_finded(e)
-    return luci.sys.exec('type -t -p "%s/%s" "%s"' % {get_customed_path(e), e, e}) ~= "" and true or false
+    return luci.sys.exec('type -t -p "/bin/%s" -p "%s" "%s"' % {e, get_customed_path(e), e}) ~= "" and true or false
+end
+
+
+function clone(org)
+    local function copy(org, res)
+        for k,v in pairs(org) do
+            if type(v) ~= "table" then
+                res[k] = v;
+            else
+                res[k] = {};
+                copy(v, res[k])
+            end
+        end
+    end
+ 
+    local res = {}
+    copy(org, res)
+    return res
 end
 
 function get_xray_path()

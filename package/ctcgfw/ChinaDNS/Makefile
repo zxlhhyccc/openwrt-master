@@ -2,8 +2,8 @@
 # Copyright (C) 2014-2018 OpenWrt-dist
 # Copyright (C) 2014-2018 Jian Chang <aa65535@live.com>
 #
-# Copyright (C) 2021 CTCGFW Project-OpenWrt
-# <https://project-openwrt.eu.org>
+# Copyright (C) 2021 ImmortalWrt
+# <https://immortalwrt.org>
 #
 # This is free software, licensed under the GNU General Public License v3.
 # See /LICENSE for more information.
@@ -16,7 +16,7 @@ PKG_VERSION:=2.0.1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://github.com/lrinQVQ/openwrt-chinadns/releases/download/v$(PKG_VERSION)
+PKG_SOURCE_URL:=@GHREPO/lrinQVQ/openwrt-chinadns/releases/download/v$(PKG_VERSION)
 PKG_HASH:=caab37a27c444d917f0b92c65d7082543dc22acc7c24322be07a108a44794369
 
 PKG_LICENSE:=GPLv3

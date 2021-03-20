@@ -1,6 +1,6 @@
 #
-# Copyright (C) 2021 CTCGFW Project-OpenWrt
-# <https://project-openwrt.eu.org>
+# Copyright (C) 2021 ImmortalWrt
+# <https://immortalwrt.org>
 #
 # This is free software, licensed under the GNU General Public License v3.
 # See /LICENSE for more information.
@@ -9,16 +9,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=simple-torrent
-PKG_VERSION:=1.2.12
-PKG_RELEASE:=2
+PKG_VERSION:=1.2.14
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/boypt/simple-torrent/tar.gz/$(PKG_VERSION)?
-PKG_HASH:=82cfa9cd9e9dca839ad542a24ecf67073fbcb703f9d890381148be99e8689716
+PKG_SOURCE_URL:=@GHCODELOAD/boypt/simple-torrent/tar.gz/$(PKG_VERSION)?
+PKG_HASH:=e3b3357ab8eb9431ec7c22b2f453d219cfe0652c5c26bbf0a052c99271cbf6a5
 
 PKG_LICENSE:=AGPL-3.0
 PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=CN_SZTL <cnsztl@project-openwrt.eu.org>
+PKG_MAINTAINER:=CN_SZTL <cnsztl@immortalwrt.org>
 
 PKG_CONFIG_DEPENDS:= \
 	CONFIG_SIMPLE_TORRENT_COMPRESS_GOPROXY \
@@ -41,7 +41,7 @@ define Package/simple-torrent
 	CATEGORY:=Network
 	SUBMENU:=BitTorrent
 	TITLE:=A self-hosted remote torrent client
-	URL:=https://github.com/ginuerzh/gost
+	URL:=https://github.com/boypt/simple-torrent
 	DEPENDS:=$(GO_ARCH_DEPENDS) +ca-bundle +libstdcpp
 endef
 

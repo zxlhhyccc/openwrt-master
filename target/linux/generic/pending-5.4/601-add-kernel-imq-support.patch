@@ -1,7 +1,7 @@
 diff -Naupr linux-5.4.10_orig/drivers/net/Kconfig linux-5.4.10/drivers/net/Kconfig
 --- linux-5.4.10_orig/drivers/net/Kconfig	2020-01-09 11:25:53.000000000 +0200
 +++ linux-5.4.10/drivers/net/Kconfig	2020-01-10 15:16:47.222143243 +0200
-@@ -283,6 +283,125 @@ config RIONET_RX_SIZE
+@@ -326,6 +326,125 @@ config RIONET_RX_SIZE
  	depends on RIONET
  	default "128"
  
@@ -130,7 +130,7 @@ diff -Naupr linux-5.4.10_orig/drivers/net/Kconfig linux-5.4.10/drivers/net/Kconf
 diff -Naupr linux-5.4.10_orig/drivers/net/Makefile linux-5.4.10/drivers/net/Makefile
 --- linux-5.4.10_orig/drivers/net/Makefile	2020-01-09 11:25:53.000000000 +0200
 +++ linux-5.4.10/drivers/net/Makefile	2020-01-10 15:16:47.222143243 +0200
-@@ -13,6 +13,7 @@ obj-$(CONFIG_DUMMY) += dummy.o
+@@ -14,6 +14,7 @@ obj-$(CONFIG_DUMMY) += dummy.o
  obj-$(CONFIG_EQUALIZER) += eql.o
  obj-$(CONFIG_IFB) += ifb.o
  obj-$(CONFIG_MACSEC) += macsec.o
@@ -1137,7 +1137,7 @@ diff -Naupr linux-5.4.10_orig/include/linux/netdevice.h linux-5.4.10/include/lin
  	/* Interface address info used in eth_type_trans() */
  	unsigned char		*dev_addr;
  
-@@ -4037,6 +4042,19 @@ static inline void netif_tx_unlock_bh(st
+@@ -4040,6 +4045,19 @@ static inline void netif_tx_unlock_bh(st
  	}						\
  }
  
@@ -1456,7 +1456,7 @@ diff -Naupr linux-5.4.10_orig/net/core/skbuff.c linux-5.4.10/net/core/skbuff.c
  
  	/* Note : this field could be in headers_start/headers_end section
  	 * It is not yet because we do not want to have a 16 bit hole
-@@ -4170,6 +4245,13 @@ void __init skb_init(void)
+@@ -4182,6 +4257,13 @@ void __init skb_init(void)
  						0,
  						SLAB_HWCACHE_ALIGN|SLAB_PANIC,
  						NULL);

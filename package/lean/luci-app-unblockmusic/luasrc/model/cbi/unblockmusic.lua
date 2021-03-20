@@ -1,7 +1,7 @@
 local fs = require "nixio.fs"
 
 mp = Map("unblockmusic", translate("解锁网易云灰色歌曲"))
-mp.description = translate("采用 [QQ/虾米/百度/酷狗/酷我/咪咕/JOOX]等音源，替换网易云变灰歌曲链接")
+mp.description = translate("采用 [QQ/百度/酷狗/酷我/咪咕/JOOX]等音源，替换网易云变灰歌曲链接")
 
 mp:section(SimpleSection).template  = "unblockmusic/unblockmusic_status"
 
@@ -21,13 +21,12 @@ end
 if nixio.fs.access("/usr/share/UnblockNeteaseMusic/app.js") then
 apptype:value("nodejs", translate("NodeJS 版本"))
 end
-apptype:value("cloud", translate("云解锁（ [CTCGFW] 云服务器）"))
+apptype:value("cloud", translate("云解锁（ 云服务器）"))
 
 speedtype = s:option(Value, "musicapptype", translate("音源选择"))
 speedtype:value("default", translate("默认"))
 speedtype:value("netease", translate("网易云音乐"))
 speedtype:value("qq", translate("QQ音乐"))
-speedtype:value("xiami", translate("虾米音乐"))
 speedtype:value("baidu", translate("百度音乐"))
 speedtype:value("kugou", translate("酷狗音乐"))
 speedtype:value("kuwo", translate("酷我音乐"))
@@ -38,7 +37,7 @@ speedtype:depends("apptype", "nodejs")
 speedtype:depends("apptype", "go")
 
 cloudserver = s:option(Value, "cloudserver", translate("服务器位置"))
-cloudserver:value("uc-gz.service.project-openwrt.eu.org:30000:30001", translate("[CTCGFW] UCloud广州（高音质）"))
+cloudserver:value("uc-gz.service.project-openwrt.eu.org:30000:30001", translate("[ImmortalWrt] UCloud广州（高音质）"))
 cloudserver.description = translate("自定义服务器格式为 IP[域名]:HTTP端口:HTTPS端口<br />如果服务器为LAN内网IP，需要将这个服务器IP放入例外客户端 (不代理HTTP和HTTPS)")
 cloudserver.default = "uc-gz.service.project-openwrt.eu.org:30000:30001"
 cloudserver.rmempty = true

@@ -83,16 +83,6 @@ o.default = "1:65535"
 o:value("1:65535", translate("All"))
 o:value("53", "DNS")
 
----- Multi SS/SSR Process Option
-o = s:option(Value, "process", translate("Multi Process Option"))
-o.default = "0"
-o.rmempty = false
-o:value("0", translate("Auto"))
-o:value("1", translate("1 Process"))
-o:value("2", "2 " .. translate("Process"))
-o:value("3", "3 " .. translate("Process"))
-o:value("4", "4 " .. translate("Process"))
-
 --[[
 ---- Proxy IPv6
 o = s:option(Flag, "proxy_ipv6", translate("Proxy IPv6"),
@@ -124,6 +114,14 @@ o.rmempty = true
 s = m:section(TypedSection, "global_other", translate("Other Settings"))
 s.anonymous = true
 s.addremove = false
+
+---- IPv6 TProxy
+o = s:option(Flag, "ipv6_tproxy", translate("IPv6 TProxy"),
+             "<font color='red'>" .. translate(
+                 "Experimental feature.Make sure that your node supports IPv6.") ..
+                 "</font>")
+o.default = 0
+o.rmempty = false
 
 o = s:option(MultiValue, "status", translate("Status info"))
 o:value("big_icon", translate("Big icon")) -- 大图标
